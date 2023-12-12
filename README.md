@@ -4,6 +4,8 @@ This repository demonstrates how to use OpenAI's pre-trained instruction-followi
 
 ![image](./images/catalog-screenshot.png)
 
+![image](./images/chroma.png)
+
 ![image](./images/app-screenshot.png)
 
 Unlike its sister AMP, this model uses OpenAI for semantic search and therefore the information you populate in the `/data` folder is part of the external API call. It requires access to the OpenAI servers and as such will not perform in an airgapped environment. By using OpenAI for the semantic search, the user has access to the latest incredibly capable models by OpenAI for accelerating insights with fast, high quality responses.
@@ -98,14 +100,14 @@ Definition of the job **Download Models**
 
 ### `3_job-populate-vectordb`
 Definition of the job **Populate Vector DB with documents embeddings**
-- Start the milvus vector database and set database to be persisted in new directory milvus-data/
+- Start the Chroma vector database and set database to be persisted in new directory chroma-data/
 - Generate embeddings for each document in data/
 - The embeddings vector for each document is inserted into the vector database
 - Stop the vector database
 
 ### `4_app`
 Definition of the application `CML LLM Chatbot`
-- Start the milvus vector database using persisted database data in milvus-data/
+- Start the Chroma vector database using persisted database data in chroma-data/
 - Start gradio interface 
 - The chat interface performs both retrieval-augmented LLM generation and regular LLM generation for bot responses.
 
@@ -119,12 +121,12 @@ Definition of the application `CML LLM Chatbot`
    - Instruction-following Large Language Model by OpenAI
 - [Hugging Face transformers library](https://pypi.org/project/transformers/)
 #### Vector Database
-- [Milvus](https://github.com/milvus-io/milvus)
+- [Chroma](https://github.com/chroma-core/chroma)
 #### Chat Frontend
 - [Gradio](https://github.com/gradio-app/gradio)
 
 ## Deploying on CML
 There are two ways to launch this prototype on CML:
 
-1. **From Prototype Catalog** - Navigate to the Prototype Catalog on a CML workspace, select the "OpenAI Chatbot Leveraging GPT 3.5 and GPT 4" tile, click "Launch as Project", click "Configure Project"
+1. **From Prototype Catalog** - *(Assumes the custom catalog entry has been added by an Admin to the environment.)* Navigate to the Prototype Catalog on a CML workspace, select the "OpenAI Chatbot Leveraging GPT 3.5 and GPT 4" tile, click "Launch as Project", click "Configure Project"
 2. **As ML Prototype** - In a CML workspace, click "New Project", add a Project Name, select "ML Prototype" as the Initial Setup option, copy in the [repo URL](https://github.com/cloudera/CML_AMP_OpenAI_Chatbot_Leveraging_GPT_3.5_and_GPT_4), click "Create Project", click "Configure Project"

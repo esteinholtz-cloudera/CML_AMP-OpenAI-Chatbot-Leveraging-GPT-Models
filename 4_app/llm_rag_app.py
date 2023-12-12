@@ -1,10 +1,33 @@
 import os
 import gradio
 import openai
-from milvus import default_server
-from pymilvus import connections, Collection
 import utils.vector_db_utils as vector_db
 import utils.model_embedding_utils as model_embedding
+import chromadb
+from chromadb.utils import embedding_functions
+
+
+## Use the following line to connect from within CML
+chroma_client = chromadb.PersistentClient(path="/home/cdsw/chroma-data")
+
+EMBEDDING_MODEL_REPO = "sentence-transformers/all-mpnet-base-v2"
+EMBEDDING_MODEL_NAME = "all-mpnet-base-v2"
+EMBEDDING_FUNCTION = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL_NAME)
+
+COLLECTION_NAME = os.getenv('COLLECTION_NAME')
+
+print("initialising Chroma DB connection...")
+print(f"Getting '{COLLECTION_NAME}' as object...")
+try:
+    chroma_client.get_collection(name=COLLECTION_NAME, embedding_function=EMBEDDING_FUNCTION)
+    print("Success")
+    collection = chroma_client.get_collection(name=COLLECTION_NAME, embedding_function=EMBEDDING_FUNCTION)
+    # Get latest statistics from index
+    current_collection_stats = collection.count()
+    print('Total number of embeddings in Chroma DB index is ' + str(current_collection_stats))
+
+except:
+    print("Error! Cannot connect to Chroma collection.")
 
 
 def main():
@@ -13,7 +36,8 @@ def main():
     demo = gradio.Interface(fn=get_responses, 
                             inputs=[gradio.Radio(['gpt-3.5-turbo', 'gpt-4'], label="Select GPT Engine", value="gpt-3.5-turbo"), gradio.Textbox(label="Question", placeholder="")],
                             outputs=[gradio.Textbox(label="Asking Open AI LLM with No Context"),
-                                     gradio.Textbox(label="Asking Open AI with Context (RAG)")],
+                                     gradio.Textbox(label="Asking Open AI with Context (RAG)"),
+                                     gradio.Textbox(label="File Path(s) Context Reference")],
                             allow_flagging="never")
 
 
@@ -43,7 +67,7 @@ def get_responses(engine, question):
     vector_db_collection.load()
     
     # Phase 1: Get nearest knowledge base chunk for a user question from a vector db
-    context_chunk = get_nearest_chunk_from_vectordb(vector_db_collection, question)
+    results, context_chunk = get_nearest_chunk_from_vectordb(vector_db_collection, question)
     vector_db_collection.release()
 
     # Phase 2a: Perform text generation with LLM model using found kb context chunk
@@ -54,33 +78,25 @@ def get_responses(engine, question):
     plainResponse = get_llm_response_without_context(question, engine)
     plain_response = plainResponse
 
-    return plain_response, rag_response
+    return plain_response, rag_response, results
 
 # Get embeddings for a user question and query Milvus vector DB for nearest knowledge base chunk
 def get_nearest_chunk_from_vectordb(vector_db_collection, question):
-    # Generate embedding for user question
-    question_embedding =  model_embedding.get_embeddings(question)
     
-    # Define search attributes for Milvus vector DB
-    vector_db_search_params = {"metric_type": "IP", "params": {"nprobe": 10}}
-    
-    # Execute search and get nearest vector, outputting the relativefilepath
-    nearest_vectors = vector_db_collection.search(
-        data=[question_embedding], # The data you are querying on
-        anns_field="embedding", # Column in collection to search on
-        param=vector_db_search_params,
-        limit=2, # limit results to 1
-        expr=None, 
-        output_fields=['relativefilepath'], # The fields you want to retrieve from the search result.
-        consistency_level="Strong"
+    results = collection.query(
+        query_texts=[str(question)],
+        n_results=1
+        # where={"metadata_field": "is_equal_to_this"}, # sample optional filter
+        # where_document={"$contains":"search_string"}  # sample optional filter
     )
-
-    # Return text of the nearest knowledgebase chunk
     response = ""
-    for f in nearest_vectors[0]:
-        response += str(load_context_chunk_from_data(f.id))
+
+    for i in range(len(results['ids'][0])):
+        file_path = results['ids'][0][i]
+
+    response += str(load_context_chunk_from_data(file_path))
     
-    return response
+    return results, response
   
 # Return the Knowledge Base doc based on Knowledge Base ID (relative file path)
 def load_context_chunk_from_data(id_path):
