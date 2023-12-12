@@ -1,8 +1,6 @@
 import os
 import gradio
 import openai
-import utils.vector_db_utils as vector_db
-import utils.model_embedding_utils as model_embedding
 import chromadb
 from chromadb.utils import embedding_functions
 
