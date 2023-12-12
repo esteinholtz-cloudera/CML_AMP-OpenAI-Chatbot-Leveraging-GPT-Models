@@ -40,18 +40,7 @@ tasks:
     kernel: python3
     cpu: 2
     memory: 4
-
-  - type: create_application
-    name: CML Chroma Server REST API Server
-    subdomain: cml-chroma-server
-    script: 2_app-run-chroma-server/launch-server.py
-    short_summary: Launch Chroma Server
-    long_summary: Launch Chroma Server REST API application. Vector Database creates encodings for GET and POST requests. Remember to enable unauthenticated app access for external access to the UI.
-    cpu: 2
-    memory: 8
-    environment_variables:
-      TASK_TYPE: CREATE_APPLICATION
-  
+ 
   - type: create_job
     name: Populate Vector DB with documents embeddings
     entity_label: vectordb_insert
