@@ -5,7 +5,7 @@ description: |
 author: Cloudera Inc.
 specification_version: 1.0
 prototype_version: 1.0
-date: "2023-11-22"
+date: "2023-12-12"
 
 environment_variables:
   OPENAI_KEY:
@@ -38,8 +38,8 @@ tasks:
     short_summary: Setup Chroma Server Vector DB
     long_summary: Resolve sqlite dependency with python version and control logging in Chroma server package
     kernel: python3
-    cpu: 2
-    memory: 4
+    cpu: 1
+    memory: 2
  
   - type: create_job
     name: Populate Vector DB with documents embeddings
