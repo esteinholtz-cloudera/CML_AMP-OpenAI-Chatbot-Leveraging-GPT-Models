@@ -60,13 +60,9 @@ def get_responses(engine, question):
 
     openai.api_key = open_ai_api_key
 
-    # Load Milvus Vector DB collection
-    vector_db_collection = Collection('cloudera_ml_docs')
-    vector_db_collection.load()
     
     # Phase 1: Get nearest knowledge base chunk for a user question from a vector db
-    results, context_chunk = get_nearest_chunk_from_vectordb(vector_db_collection, question)
-    vector_db_collection.release()
+    results, context_chunk = get_nearest_chunk_from_vectordb(question)
 
     # Phase 2a: Perform text generation with LLM model using found kb context chunk
     contextResponse = get_llm_response_with_context(question, context_chunk, engine)
@@ -78,8 +74,8 @@ def get_responses(engine, question):
 
     return plain_response, rag_response, results
 
-# Get embeddings for a user question and query Milvus vector DB for nearest knowledge base chunk
-def get_nearest_chunk_from_vectordb(vector_db_collection, question):
+# Get embeddings for a user question and query Chroma vector DB for nearest knowledge base chunk
+def get_nearest_chunk_from_vectordb(question):
     
     results = collection.query(
         query_texts=[str(question)],
@@ -94,7 +90,7 @@ def get_nearest_chunk_from_vectordb(vector_db_collection, question):
 
     response += str(load_context_chunk_from_data(file_path))
     
-    return results, response
+    return str(results), response
   
 # Return the Knowledge Base doc based on Knowledge Base ID (relative file path)
 def load_context_chunk_from_data(id_path):
