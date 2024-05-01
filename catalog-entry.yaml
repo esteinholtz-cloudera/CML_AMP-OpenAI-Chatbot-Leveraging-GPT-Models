@@ -16,7 +16,7 @@ entries:
         generation with factual responses.
 
     image_path: >-
-      https://raw.githubusercontent.com/cloudera/CML_AMP-OpenAI-Chatbot-Leveraging-GPT-Models/main/images/catalog-screenshot.png
+      https://raw.githubusercontent.com/kevinbtalbert/CML_AMP-OpenAI-Chatbot-Leveraging-GPT-Models/main/images/catalog-screenshot.png
     tags:
       - OpenAI
       - Chroma
@@ -27,5 +27,5 @@ entries:
       - Vector DB
       - Transformers
       - NLP
-    git_url: 'https://github.com/cloudera/CML_AMP-OpenAI-Chatbot-Leveraging-GPT-Models'
+    git_url: 'https://github.com/kevinbtalbert/CML_AMP-OpenAI-Chatbot-Leveraging-GPT-Models'
     is_prototype: true
