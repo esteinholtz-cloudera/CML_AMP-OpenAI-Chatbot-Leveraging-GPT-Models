@@ -11,6 +11,7 @@ from chromadb.utils import embedding_functions
 EMBEDDING_MODEL_REPO = "sentence-transformers/all-mpnet-base-v2"
 EMBEDDING_MODEL_NAME = "all-mpnet-base-v2"
 EMBEDDING_FUNCTION = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL_NAME)
+MATCHING_FUNCTION = "cosine" # valid values: l2, ip, cosine. Default is l2, which is not best practice (ie we dont want this). This value CAN NOT be determined on search but has to be defined once and for all when creating collection
 
 COLLECTION_NAME = os.getenv('COLLECTION_NAME')
 
@@ -23,8 +24,9 @@ try:
     collection = chroma_client.get_collection(name=COLLECTION_NAME, embedding_function=EMBEDDING_FUNCTION)
 except:
     print("Creating new collection...")
-    collection = chroma_client.create_collection(name=COLLECTION_NAME, embedding_function=EMBEDDING_FUNCTION)
+    collection = chroma_client.create_collection(name=COLLECTION_NAME, embedding_function=EMBEDDING_FUNCTION, metadata= {"hnsw:space": MATCHING_FUNCTION})
     print("Success")
+
 
 # Get latest statistics from index
 current_collection_stats = collection.count()
