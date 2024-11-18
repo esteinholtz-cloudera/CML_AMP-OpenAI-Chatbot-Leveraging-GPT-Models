@@ -27,5 +27,5 @@ entries:
       - Vector DB
       - Transformers
       - NLP
-    git_url: 'https://github.com/kevinbtalbert/CML_AMP-OpenAI-Chatbot-Leveraging-GPT-Models'
+    git_url: 'https://github.com/cloudera-esteinholtz/CML_AMP-OpenAI-Chatbot-Leveraging-GPT-Models'
     is_prototype: true
